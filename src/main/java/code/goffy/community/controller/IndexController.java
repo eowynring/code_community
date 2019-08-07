@@ -1,5 +1,6 @@
 package code.goffy.community.controller;
 
+import code.goffy.community.dto.PaginationDTO;
 import code.goffy.community.dto.QuestionDTO;
 import code.goffy.community.mapper.QuestionMapper;
 import code.goffy.community.mapper.UserMapper;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +30,11 @@ public class IndexController {
     private QuestionService questionService;
 
     @GetMapping("/")
-    public String hello(HttpServletRequest request, Model model){
+    public String hello(HttpServletRequest request,
+                        Model model,
+                        @RequestParam(name = "page",defaultValue = "1") Integer page,
+                        @RequestParam(name = "size",defaultValue = "4") Integer size
+                        ){
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length !=0)
             for (Cookie cookie : cookies) {
@@ -42,8 +48,8 @@ public class IndexController {
                 }
             }
         //得到问题列表
-        List<QuestionDTO> questionDTOS = questionService.questionList();
-        model.addAttribute("questionDTOS",questionDTOS);
+        PaginationDTO pagination = questionService.questionList(page,size);
+        model.addAttribute("pagination",pagination);
         return "index";
     }
 }
